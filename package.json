@@ -109,6 +109,13 @@
             "order": 5,
             "scope": "resource",
             "markdownDescription": "编辑区显示行号（默认开启）。"
+          },
+          "pennaMarkdown.ui.shortcuts": {
+            "type": "boolean",
+            "default": true,
+            "order": 6,
+            "scope": "resource",
+            "markdownDescription": "启用编辑命令快捷键（加粗 / 标题 / 列表等，对齐 Typora）。关闭后仍可用工具栏。\n\n默认：开启。"
           }
         }
       },
@@ -327,6 +334,6 @@
   },
   "private": true,
   "dependencies": {
-    "penna-markdown": "^0.2.2"
+    "penna-markdown": "^0.2.6"
   }
 }

@@ -22,6 +22,7 @@ interface PennaBoot {
   statusbar: boolean;
   sidebar: boolean;
   lineNumbers: boolean;
+  shortcuts: boolean;
   uploadEnabled: boolean;
   aiEnabled: boolean;
 }
@@ -82,6 +83,8 @@ class PennaWebviewApp {
     const editorOptions: EditorOptions = {
       value: boot.text,
       lineNumbers: boot.lineNumbers,
+      // true → 省略，走 penna-markdown DEFAULT_SHORTCUTS；false → 关闭
+      shortcuts: boot.shortcuts ? undefined : false,
     };
 
     if (boot.uploadEnabled) {

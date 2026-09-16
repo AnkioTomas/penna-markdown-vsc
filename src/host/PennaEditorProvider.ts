@@ -17,6 +17,7 @@ export interface PennaBootPayload {
   statusbar: boolean;
   sidebar: boolean;
   lineNumbers: boolean;
+  shortcuts: boolean;
   uploadEnabled: boolean;
   aiEnabled: boolean;
 }
@@ -100,6 +101,7 @@ export class PennaEditorProvider implements vscode.CustomTextEditorProvider {
       statusbar: config.getItem<boolean>("ui.statusbar", true),
       sidebar: config.getItem<boolean>("ui.sidebar", true),
       lineNumbers: config.getItem<boolean>("ui.lineNumbers", true),
+      shortcuts: config.getItem<boolean>("ui.shortcuts", true),
       uploadEnabled: isUploadEnabled(),
       aiEnabled: config.getItem<boolean>("ai.enabled", false),
     });
