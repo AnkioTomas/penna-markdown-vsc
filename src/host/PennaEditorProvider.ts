@@ -8,6 +8,19 @@ import {
   extResponse,
 } from "../webview/PennaBridge";
 
+/** 可 JSON 序列化的 syntaxOptions，对齐 penna-markdown `SyntaxOptions` */
+export interface PennaBootSyntaxOptions {
+  code: {
+    enhanced: boolean;
+    lineNumbers: boolean;
+    wrap: boolean;
+    mermaidApiHost?: string;
+    echartsApiHost?: string;
+  };
+  atx_heading: { slug: boolean };
+  math_block: { apiHost?: string };
+}
+
 /** Host → Webview 的编辑器启动/重建载荷 */
 export interface PennaBootPayload {
   text: string;
@@ -18,6 +31,8 @@ export interface PennaBootPayload {
   sidebar: boolean;
   lineNumbers: boolean;
   shortcuts: boolean;
+  previewMaxWidth: number;
+  syntaxOptions: PennaBootSyntaxOptions;
   uploadEnabled: boolean;
   aiEnabled: boolean;
 }
@@ -93,6 +108,27 @@ export class PennaEditorProvider implements vscode.CustomTextEditorProvider {
       return true;
     };
 
+    /**
+     * 远程渲染服务地址：空串不是有效值。
+     * 库内是 `!= null` 兜底内置地址，传空串会拼出坏 URL，必须退化成 undefined。
+     */
+    const apiHost = (key: string): string | undefined =>
+      config.getItem<string>(key, "").trim() || undefined;
+
+    const buildSyntaxOptions = (): PennaBootSyntaxOptions => ({
+      code: {
+        enhanced: config.getItem<boolean>("render.codeEnhanced", true),
+        lineNumbers: config.getItem<boolean>("render.codeLineNumbers", true),
+        wrap: config.getItem<boolean>("render.codeWrap", false),
+        mermaidApiHost: apiHost("render.mermaidApiHost"),
+        echartsApiHost: apiHost("render.echartsApiHost"),
+      },
+      atx_heading: {
+        slug: config.getItem<boolean>("render.headingSlug", true),
+      },
+      math_block: { apiHost: apiHost("render.mathApiHost") },
+    });
+
     const buildBoot = (): PennaBootPayload => ({
       text: document.getText(),
       appearance: this.resolveAppearance(),
@@ -102,6 +138,8 @@ export class PennaEditorProvider implements vscode.CustomTextEditorProvider {
       sidebar: config.getItem<boolean>("ui.sidebar", true),
       lineNumbers: config.getItem<boolean>("ui.lineNumbers", true),
       shortcuts: config.getItem<boolean>("ui.shortcuts", true),
+      previewMaxWidth: config.getItem<number>("ui.previewMaxWidth", 720),
+      syntaxOptions: buildSyntaxOptions(),
       uploadEnabled: isUploadEnabled(),
       aiEnabled: config.getItem<boolean>("ai.enabled", false),
     });

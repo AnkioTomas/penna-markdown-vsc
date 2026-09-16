@@ -3,6 +3,7 @@ import {
   DEFAULT_TOOLBAR_ITEMS,
   type PennaOptions,
   type EditorOptions,
+  type SyntaxOptions,
 } from "penna-markdown";
 import "penna-markdown/editor.css";
 import "penna-markdown/transformer.css";
@@ -23,6 +24,8 @@ interface PennaBoot {
   sidebar: boolean;
   lineNumbers: boolean;
   shortcuts: boolean;
+  previewMaxWidth: number;
+  syntaxOptions: SyntaxOptions;
   uploadEnabled: boolean;
   aiEnabled: boolean;
 }
@@ -167,7 +170,8 @@ class PennaWebviewApp {
         ],
       },
       preview: {
-        maxWidth: "720px",
+        maxWidth: `${boot.previewMaxWidth}px`,
+        transformerEngineOptions: { syntaxOptions: boot.syntaxOptions },
       },
       editor: this.buildEditorOptions(boot),
     };

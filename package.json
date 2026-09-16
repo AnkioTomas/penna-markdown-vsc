@@ -116,13 +116,77 @@
             "order": 6,
             "scope": "resource",
             "markdownDescription": "启用编辑命令快捷键（加粗 / 标题 / 列表等，对齐 Typora）。关闭后仍可用工具栏。\n\n默认：开启。"
+          },
+          "pennaMarkdown.ui.previewMaxWidth": {
+            "type": "number",
+            "default": 720,
+            "minimum": 200,
+            "order": 7,
+            "scope": "resource",
+            "markdownDescription": "仅预览布局下的正文最大宽度（px）。分栏布局由窗口决定，此项不生效。\n\n默认：`720`。"
+          }
+        }
+      },
+      {
+        "id": "pennaMarkdown.render",
+        "title": "预览渲染",
+        "order": 2,
+        "properties": {
+          "pennaMarkdown.render.codeEnhanced": {
+            "type": "boolean",
+            "default": true,
+            "order": 1,
+            "scope": "resource",
+            "markdownDescription": "代码块增强渲染（语言顶栏、复制、行高亮、折叠、图表）。关闭后输出朴素 GFM 代码块。\n\n对应 `syntaxOptions.code.enhanced`。默认：开启。"
+          },
+          "pennaMarkdown.render.codeLineNumbers": {
+            "type": "boolean",
+            "default": true,
+            "order": 2,
+            "scope": "resource",
+            "markdownDescription": "预览区代码块显示行号（与编辑区行号无关）。\n\n对应 `syntaxOptions.code.lineNumbers`。默认：开启。"
+          },
+          "pennaMarkdown.render.codeWrap": {
+            "type": "boolean",
+            "default": false,
+            "order": 3,
+            "scope": "resource",
+            "markdownDescription": "预览区代码块超长行自动换行。关闭时横向滚动。\n\n对应 `syntaxOptions.code.wrap`。默认：关闭。"
+          },
+          "pennaMarkdown.render.headingSlug": {
+            "type": "boolean",
+            "default": true,
+            "order": 4,
+            "scope": "resource",
+            "markdownDescription": "给标题生成 `id` 锚点，可用 `#锚点` 跳转。\n\n对应 `syntaxOptions.atx_heading.slug`。默认：开启。"
+          },
+          "pennaMarkdown.render.mathApiHost": {
+            "type": "string",
+            "default": "",
+            "order": 5,
+            "scope": "resource",
+            "markdownDescription": "块级公式远程渲染 API 基址。留空用库内置地址。\n\n对应 `syntaxOptions.math_block.apiHost`。"
+          },
+          "pennaMarkdown.render.mermaidApiHost": {
+            "type": "string",
+            "default": "",
+            "order": 6,
+            "scope": "resource",
+            "markdownDescription": "Mermaid 远程渲染 API 基址。留空用库内置地址。\n\n对应 `syntaxOptions.code.mermaidApiHost`。"
+          },
+          "pennaMarkdown.render.echartsApiHost": {
+            "type": "string",
+            "default": "",
+            "order": 7,
+            "scope": "resource",
+            "markdownDescription": "ECharts 远程渲染 API 基址。留空用库内置地址。\n\n对应 `syntaxOptions.code.echartsApiHost`。"
           }
         }
       },
       {
         "id": "pennaMarkdown.files",
         "title": "文件处理",
-        "order": 2,
+        "order": 3,
         "properties": {
           "pennaMarkdown.upload.mode": {
             "type": "string",
@@ -186,7 +250,7 @@
       {
         "id": "pennaMarkdown.ai",
         "title": "AI",
-        "order": 3,
+        "order": 4,
         "properties": {
           "pennaMarkdown.ai.enabled": {
             "type": "boolean",
