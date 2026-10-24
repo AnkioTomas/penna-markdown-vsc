@@ -7,6 +7,7 @@ import {
 } from "penna-markdown";
 import "penna-markdown/editor.css";
 import "penna-markdown/transformer.css";
+import "katex/dist/katex.min.css";
 import "./themes.css";
 import "./styles.css";
 import { PennaBridge } from "./PennaBridge";
@@ -171,6 +172,11 @@ class PennaWebviewApp {
       },
       preview: {
         maxWidth: `${boot.previewMaxWidth}px`,
+        engines: {
+          math: () => import("katex"),
+          mermaid: () => import("mermaid"),
+          echarts: () => import("echarts"),
+        },
         transformerEngineOptions: { syntaxOptions: boot.syntaxOptions },
       },
       editor: this.buildEditorOptions(boot),

@@ -159,27 +159,6 @@
             "order": 4,
             "scope": "resource",
             "markdownDescription": "给标题生成 `id` 锚点，可用 `#锚点` 跳转。\n\n对应 `syntaxOptions.atx_heading.slug`。默认：开启。"
-          },
-          "pennaMarkdown.render.mathApiHost": {
-            "type": "string",
-            "default": "",
-            "order": 5,
-            "scope": "resource",
-            "markdownDescription": "块级公式远程渲染 API 基址。留空用库内置地址。\n\n对应 `syntaxOptions.math_block.apiHost`。"
-          },
-          "pennaMarkdown.render.mermaidApiHost": {
-            "type": "string",
-            "default": "",
-            "order": 6,
-            "scope": "resource",
-            "markdownDescription": "Mermaid 远程渲染 API 基址。留空用库内置地址。\n\n对应 `syntaxOptions.code.mermaidApiHost`。"
-          },
-          "pennaMarkdown.render.echartsApiHost": {
-            "type": "string",
-            "default": "",
-            "order": 7,
-            "scope": "resource",
-            "markdownDescription": "ECharts 远程渲染 API 基址。留空用库内置地址。\n\n对应 `syntaxOptions.code.echartsApiHost`。"
           }
         }
       },
@@ -398,6 +377,9 @@
   },
   "private": true,
   "dependencies": {
-    "penna-markdown": "^0.2.6"
+    "echarts": "^6.1.0",
+    "katex": "^0.19.1",
+    "mermaid": "^12.2.0",
+    "penna-markdown": "^0.2.7"
   }
 }

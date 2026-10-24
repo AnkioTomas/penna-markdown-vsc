@@ -2,17 +2,16 @@ import { defineConfig } from "vite";
 import { resolve } from "path";
 
 export default defineConfig({
+  base: "./",
   build: {
     outDir: "dist/webview",
     emptyOutDir: true,
     rollupOptions: {
       input: resolve(__dirname, "src/webview/main.ts"),
       output: {
-        format: "iife",
-        name: "PennaMarkdownWebview",
+        format: "es",
         entryFileNames: "main.js",
         assetFileNames: "main.[ext]",
-        inlineDynamicImports: true,
       },
     },
     sourcemap: false,

@@ -14,11 +14,8 @@ export interface PennaBootSyntaxOptions {
     enhanced: boolean;
     lineNumbers: boolean;
     wrap: boolean;
-    mermaidApiHost?: string;
-    echartsApiHost?: string;
   };
   atx_heading: { slug: boolean };
-  math_block: { apiHost?: string };
 }
 
 /** Host → Webview 的编辑器启动/重建载荷 */
@@ -108,25 +105,15 @@ export class PennaEditorProvider implements vscode.CustomTextEditorProvider {
       return true;
     };
 
-    /**
-     * 远程渲染服务地址：空串不是有效值。
-     * 库内是 `!= null` 兜底内置地址，传空串会拼出坏 URL，必须退化成 undefined。
-     */
-    const apiHost = (key: string): string | undefined =>
-      config.getItem<string>(key, "").trim() || undefined;
-
     const buildSyntaxOptions = (): PennaBootSyntaxOptions => ({
       code: {
         enhanced: config.getItem<boolean>("render.codeEnhanced", true),
         lineNumbers: config.getItem<boolean>("render.codeLineNumbers", true),
         wrap: config.getItem<boolean>("render.codeWrap", false),
-        mermaidApiHost: apiHost("render.mermaidApiHost"),
-        echartsApiHost: apiHost("render.echartsApiHost"),
       },
       atx_heading: {
         slug: config.getItem<boolean>("render.headingSlug", true),
       },
-      math_block: { apiHost: apiHost("render.mathApiHost") },
     });
 
     const buildBoot = (): PennaBootPayload => ({
@@ -348,6 +335,9 @@ export class PennaEditorProvider implements vscode.CustomTextEditorProvider {
     const scriptUri = webview.asWebviewUri(
       vscode.Uri.joinPath(extensionUri, "dist", "webview", "main.js"),
     );
+    const styleUri = webview.asWebviewUri(
+      vscode.Uri.joinPath(extensionUri, "dist", "webview", "main.css"),
+    );
     const baseHref = escapeHtmlAttr(documentBaseHref(webview, documentUri));
     const appearance = this.resolveAppearance();
     const source = webview.cspSource;
@@ -380,10 +370,11 @@ export class PennaEditorProvider implements vscode.CustomTextEditorProvider {
     }
     #penna-root { width: 100%; height: 100%; }
   </style>
+  <link rel="stylesheet" href="${styleUri}" />
 </head>
 <body>
   <div id="penna-root"></div>
-  <script src="${scriptUri}"></script>
+  <script type="module" src="${scriptUri}"></script>
 </body>
 </html>`;
   }
