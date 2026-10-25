@@ -5,6 +5,10 @@ interface AiProviderPreset {
   /** OpenAI 兼容 Chat Completions 完整 URL */
   endpoint: string;
   defaultModel: string;
+  /** 端点域名特征，自定义供应商据此识别 */
+  host?: string;
+  /** 关闭思考要并入请求体的参数；省略 = 没有可用开关（如 OpenAI 推理模型关不掉） */
+  thinkingOff?: Record<string, unknown>;
 }
 
 /** 内置供应商：全部走 OpenAI Chat Completions 协议 */
@@ -13,33 +17,101 @@ export const AI_PROVIDERS: Record<AiProvider, AiProviderPreset> = {
     label: "OpenAI (ChatGPT)",
     endpoint: "https://api.openai.com/v1/chat/completions",
     defaultModel: "gpt-4o-mini",
+    host: "api.openai.com",
   },
   openrouter: {
     label: "OpenRouter",
     endpoint: "https://openrouter.ai/api/v1/chat/completions",
     defaultModel: "openai/gpt-4o-mini",
+    host: "openrouter.ai",
+    // https://openrouter.ai/docs/guides/best-practices/reasoning-tokens
+    thinkingOff: { reasoning: { enabled: false } },
+  },
+  gemini: {
+    label: "Google Gemini",
+    endpoint:
+      "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+    defaultModel: "gemini-2.5-flash",
+    host: "generativelanguage.googleapis.com",
+    thinkingOff: { reasoning_effort: "none" },
   },
   deepseek: {
     label: "DeepSeek",
     endpoint: "https://api.deepseek.com/v1/chat/completions",
     defaultModel: "deepseek-chat",
+    host: "api.deepseek.com",
+    thinkingOff: { thinking: { type: "disabled" } },
   },
   moonshot: {
     label: "Moonshot (Kimi)",
     endpoint: "https://api.moonshot.cn/v1/chat/completions",
     defaultModel: "moonshot-v1-8k",
+    host: "moonshot.cn",
+    thinkingOff: { thinking: { type: "disabled" } },
+  },
+  zhipu: {
+    label: "智谱 GLM",
+    endpoint: "https://open.bigmodel.cn/api/paas/v4/chat/completions",
+    defaultModel: "glm-4.5-air",
+    host: "bigmodel.cn",
+    thinkingOff: { thinking: { type: "disabled" } },
+  },
+  volcengine: {
+    label: "火山引擎 / 豆包",
+    endpoint: "https://ark.cn-beijing.volces.com/api/v3/chat/completions",
+    // 火山方舟必须填接入点 ID 或模型名，没有通用默认值
+    defaultModel: "",
+    host: "volces.com",
+    thinkingOff: { thinking: { type: "disabled" } },
+  },
+  dashscope: {
+    label: "阿里云百炼 / 通义",
+    endpoint:
+      "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+    defaultModel: "qwen-plus",
+    host: "aliyuncs.com",
+    thinkingOff: { enable_thinking: false },
+  },
+  siliconflow: {
+    label: "SiliconFlow",
+    endpoint: "https://api.siliconflow.cn/v1/chat/completions",
+    defaultModel: "Qwen/Qwen3-8B",
+    host: "siliconflow",
+    thinkingOff: { enable_thinking: false },
   },
   ollama: {
-    label: "Ollama (本地)",
+    label: "Ollama / vLLM 等自建",
     endpoint: "http://127.0.0.1:11434/v1/chat/completions",
     defaultModel: "llama3.2",
+    thinkingOff: { chat_template_kwargs: { enable_thinking: false } },
   },
   custom: {
-    label: "自定义",
+    label: "自定义（按地址识别）",
     endpoint: "",
     defaultModel: "",
   },
 };
+
+/** 自定义端点认不出供应商时，把常见的关闭思考参数一并带上，各家忽略不认识的字段 */
+const GENERIC_THINKING_OFF: Record<string, unknown> = {
+  chat_template_kwargs: { enable_thinking: false },
+  reasoning: { enabled: false },
+};
+
+/** 关闭思考时要并入请求体的参数；自定义供应商按端点域名识别，认不出用通用参数 */
+export function resolveThinkingOff(
+  provider: AiProvider,
+  endpoint: string,
+): Record<string, unknown> | undefined {
+  if (provider !== "custom") {
+    return AI_PROVIDERS[provider].thinkingOff;
+  }
+  const lower = endpoint.toLowerCase();
+  const matched = Object.values(AI_PROVIDERS).find(
+    (p) => p.host && lower.includes(p.host),
+  );
+  return matched ? matched.thinkingOff : GENERIC_THINKING_OFF;
+}
 
 export const AI_OUTPUT_RULES = `
 输出规则（必须遵守）：
@@ -220,11 +292,16 @@ export class PennaAi {
 
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
-      ...this.config.getItem<Record<string, string>>("ai.headers", {}),
     };
-    if (apiKey && !headers.Authorization && !headers.authorization) {
+    if (apiKey) {
       headers.Authorization = `Bearer ${apiKey}`;
     }
+    const thinkingOff = this.config.getItem<boolean>("ai.thinking", false)
+      ? undefined
+      : resolveThinkingOff(
+          this.config.getItem<AiProvider>("ai.provider", "openai"),
+          endpoint,
+        );
 
     try {
       let response: Response;
@@ -233,6 +310,7 @@ export class PennaAi {
           method: "POST",
           headers,
           body: JSON.stringify({
+            ...thinkingOff,
             model,
             messages: [
               { role: "system", content: system },

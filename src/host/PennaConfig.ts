@@ -13,8 +13,13 @@ export type AiActionId =
 export type AiProvider =
   | "openai"
   | "openrouter"
+  | "gemini"
   | "deepseek"
   | "moonshot"
+  | "zhipu"
+  | "volcengine"
+  | "dashscope"
+  | "siliconflow"
   | "ollama"
   | "custom";
 

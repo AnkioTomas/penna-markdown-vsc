@@ -1,7 +1,7 @@
 {
   "name": "penna-markdown",
   "displayName": "Penna Markdown",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "VS Code / Cursor extension for Penna Markdown",
   "publisher": "ankio",
   "license": "MIT",
@@ -243,8 +243,13 @@
             "enum": [
               "openai",
               "openrouter",
+              "gemini",
               "deepseek",
               "moonshot",
+              "zhipu",
+              "volcengine",
+              "dashscope",
+              "siliconflow",
               "ollama",
               "custom"
             ],
@@ -254,19 +259,24 @@
             "enumDescriptions": [
               "OpenAI / ChatGPT（api.openai.com）",
               "OpenRouter（openrouter.ai）",
+              "Google Gemini（generativelanguage.googleapis.com）",
               "DeepSeek（api.deepseek.com）",
               "Moonshot Kimi（api.moonshot.cn）",
-              "Ollama 本地（127.0.0.1:11434）",
-              "自定义 OpenAI 兼容地址（需填写 endpoint）"
+              "智谱 GLM（open.bigmodel.cn）",
+              "火山引擎 / 豆包（volces.com，模型需自填）",
+              "阿里云百炼 / 通义（dashscope.aliyuncs.com）",
+              "SiliconFlow（api.siliconflow.cn）",
+              "Ollama / vLLM 等自建（127.0.0.1:11434）",
+              "自定义 OpenAI 兼容地址（需填写 endpoint，按域名识别供应商）"
             ],
-            "markdownDescription": "AI 供应商预设。内置供应商自动填 endpoint 与默认模型；选 `custom` 时必须配置 `endpoint`。\n\n默认：`openai`。"
+            "markdownDescription": "AI 供应商预设。内置供应商自动填 endpoint 与默认模型；选 `custom` 时必须配置 `endpoint`，并按其域名识别供应商以关闭思考。\n\n默认：`openai`。"
           },
           "pennaMarkdown.ai.endpoint": {
             "type": "string",
             "default": "",
             "order": 3,
             "scope": "window",
-            "markdownDescription": "Chat Completions 完整 URL。留空则使用供应商预设；非空时覆盖预设（适合代理 / 私有部署）。\n\n供应商默认：\n- `openai` → `https://api.openai.com/v1/chat/completions`\n- `openrouter` → `https://openrouter.ai/api/v1/chat/completions`\n- `deepseek` → `https://api.deepseek.com/v1/chat/completions`\n- `moonshot` → `https://api.moonshot.cn/v1/chat/completions`\n- `ollama` → `http://127.0.0.1:11434/v1/chat/completions`\n- `custom` → `（必填）`\n\n例：`https://api.openai.com/v1/chat/completions`"
+            "markdownDescription": "Chat Completions 完整 URL。留空则使用供应商预设；非空时覆盖预设（适合代理 / 私有部署）。\n\n供应商默认：\n- `openai` → `https://api.openai.com/v1/chat/completions`\n- `openrouter` → `https://openrouter.ai/api/v1/chat/completions`\n- `gemini` → `https://generativelanguage.googleapis.com/v1beta/openai/chat/completions`\n- `deepseek` → `https://api.deepseek.com/v1/chat/completions`\n- `moonshot` → `https://api.moonshot.cn/v1/chat/completions`\n- `zhipu` → `https://open.bigmodel.cn/api/paas/v4/chat/completions`\n- `volcengine` → `https://ark.cn-beijing.volces.com/api/v3/chat/completions`\n- `dashscope` → `https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions`\n- `siliconflow` → `https://api.siliconflow.cn/v1/chat/completions`\n- `ollama` → `http://127.0.0.1:11434/v1/chat/completions`\n- `custom` → `（必填）`\n\n例：`https://api.openai.com/v1/chat/completions`"
           },
           "pennaMarkdown.ai.apiKey": {
             "type": "string",
@@ -287,7 +297,7 @@
             "default": "",
             "order": 6,
             "scope": "window",
-            "markdownDescription": "模型名称。留空则使用当前供应商默认：\n- `openai` → `gpt-4o-mini`\n- `openrouter` → `openai/gpt-4o-mini`\n- `deepseek` → `deepseek-chat`\n- `moonshot` → `moonshot-v1-8k`\n- `ollama` → `llama3.2`\n- `custom` → `（必填）`"
+            "markdownDescription": "模型名称。留空则使用当前供应商默认：\n- `openai` → `gpt-4o-mini`\n- `openrouter` → `openai/gpt-4o-mini`\n- `gemini` → `gemini-2.5-flash`\n- `deepseek` → `deepseek-chat`\n- `moonshot` → `moonshot-v1-8k`\n- `zhipu` → `glm-4.5-air`\n- `volcengine` → `（必填，接入点 ID）`\n- `dashscope` → `qwen-plus`\n- `siliconflow` → `Qwen/Qwen3-8B`\n- `ollama` → `llama3.2`\n- `custom` → `（必填）`"
           },
           "pennaMarkdown.ai.temperature": {
             "type": "number",
@@ -298,15 +308,12 @@
             "scope": "window",
             "markdownDescription": "采样温度。`-1` 表示按动作使用内置默认；`0`–`2` 则统一覆盖。\n\n动作默认（当值为 `-1`）：\n- `polish` → `0.4`\n- `proofread` → `0.1`\n- `translate` → `0.2`\n- `summarize` → `0.3`\n- `custom` → `0.4`"
           },
-          "pennaMarkdown.ai.headers": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "default": {},
+          "pennaMarkdown.ai.thinking": {
+            "type": "boolean",
+            "default": false,
             "order": 8,
             "scope": "window",
-            "markdownDescription": "额外 HTTP 头。若已含 `Authorization`，则不再自动附加 Bearer。\n\n默认：`{}`。"
+            "markdownDescription": "是否启用模型思考。默认关闭：请求会带上当前供应商对应的关闭参数（润色等场景更快）。OpenAI 推理模型无法关闭。\n\n默认：关闭。"
           },
           "pennaMarkdown.ai.timeoutMs": {
             "type": "number",

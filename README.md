@@ -97,7 +97,7 @@ code --install-extension ./dist/penna-markdown-vsc.vsix
 | `ai.apiKeyEnv` | 从环境变量读 Key（`apiKey` 为空时） | `""` |
 | `ai.model` | 模型名，空则用供应商默认 | `""` |
 | `ai.temperature` | `-1` 按动作默认；`0`–`2` 统一覆盖 | `-1` |
-| `ai.headers` | 额外 HTTP 头 | `{}` |
+| `ai.thinking` | 启用思考；关闭时按供应商自动带关闭参数 | `false` |
 | `ai.timeoutMs` | 请求超时 | `120000` |
 | `ai.prompt.*` | 各动作 system 提示词，空则用内置 | `""` |
 
